@@ -37,7 +37,6 @@
       value={letter}
       type='text'
       class='input'
-      placeholder="ej: X,Y,Z"
     />
     <button on:click={reset}>Reiniciar</button>
   </div>

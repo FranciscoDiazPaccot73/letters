@@ -73,13 +73,10 @@
       minutes = parseInt(duration / 3600, 10);
       // @ts-ignore
       seconds = parseInt(duration % 60, 10);
-
       minutes = minutes < 10 ? "0" + minutes : minutes;
       seconds = seconds < 10 ? "0" + seconds : seconds;
-
       // @ts-ignore
       display.textContent = minutes + ":" + seconds;
-
       if (--duration < 0) {
         duration = timer;
         timerRunning = false;
@@ -94,6 +91,12 @@
     // @ts-ignore
     clearInterval(interval)
     formatTime()
+  }
+
+  //@ts-ignore
+  function removeChar(char) {
+    const newArray = excludedLetters.filter(l => l !== char);
+    excludedLetters = newArray;
   }
 </script>
 
@@ -130,7 +133,7 @@
     <Input addExcluded={addExcluded} resetExcluded={resetExcluded} />
     <div class="tags">
       {#each excludedLetters as character}
-        <span>{character}</span>
+        <div on:click={() => removeChar(character)}>{character}</div>
       {/each}
     </div>
   </div>
@@ -252,12 +255,17 @@
     position: relative;
   }
   .tags {
+    bottom: -30px;
     height: 20px;
-    width: 100%;
     position: absolute;
-    bottom: -24px;
+    width: 256px;
+    display: flex;
   }
-  .tags span {
+  .tags div {
+    background-color: #ccc;
+    border-radius: 20px;
     height: 16px;
+    margin-left: 8px;
+    padding: 4px 6px;
   }
 </style>
