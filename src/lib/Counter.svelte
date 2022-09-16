@@ -18,10 +18,18 @@
 	/**
 	 * @type {any}
 	*/ let shouldRepeat;
+	export
+	/**
+	 * @type {any}
+	*/ let excludedLetters;
 	 export
 	/**
 	 * @type {any}
 	*/ let startTimer;
+	export
+	/**
+	 * @type {any}
+	*/ let timerActive;
 
 	const displayed_index = spring();
 	$: displayed_index.set(index);
@@ -39,6 +47,16 @@
 		if (!shouldRepeat) {
 			letters = letters.filter(letter => letter !== currentLetter)
 		}
+		if (excludedLetters.length) {
+			/**
+			 * @type {any[]}
+			*/
+			const newLettersArray = [];
+			letters.forEach(l => {
+				if (!excludedLetters.includes(l)) newLettersArray.push(l);
+			})
+			letters = newLettersArray;
+		}
 		firstRun = false;
 		alreadyUsed = false;
 		index = Math.floor(Math.random()*letters.length);
@@ -46,6 +64,10 @@
 		setTimeout(() => {
 			disableButtons = false
 			currentLetter = letters[index]
+			if (!firstRun) {
+				alreadySeen.push(currentLetter)
+				alreadySeenString = alreadySeen.join(' ')
+			}
 		}, 500)
 	}
 
@@ -53,7 +75,14 @@
 		alreadySeen.push(currentLetter)
 		alreadySeenString = alreadySeen.join(' ')
 		alreadyUsed = true;
-		startTimer();
+		if (timerActive) startTimer();
+	}
+
+	function reset() {
+		alreadySeen = [];
+		alreadySeenString = '';
+		letters = allLetters.sort(() => Math.random() - 0.5);
+		firstRun = true;
 	}
 </script>
 
@@ -61,10 +90,10 @@
 	<div class="counter">
 		<div class="counter-viewport">
 			<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
-				{#each letters as letter}
-					<strong class="hidden" aria-hidden="true">{letter}</strong>
+				{#each letters as letter, index}
+					<strong class="hidden" style="top: -{64 + 64 * index}px" aria-hidden="true">{letter}</strong>
 				{/each}
-				<strong>{firstRun ? '?' : letters[index]}</strong>
+				<strong>{firstRun || !letters[index] ? '?' : letters[index]}</strong>
 			</div>
 		</div>
 	</div>
@@ -72,12 +101,15 @@
 		<button disabled={disableButtons} on:click={initializeSelector}>
 			Nueva Letra
 		</button>
-		<button disabled={disableButtons || firstRun || alreadyUsed} on:click={useLetter}>
+		<button disabled={disableButtons || firstRun || alreadyUsed || !timerActive} on:click={useLetter}>
 			Usar
 		</button>
 	</div>
 	<div class='letters'>
-		<div class='letters-title'>Letras que salieron:</div>
+		<div class='letters-title'>
+			<span>Letras que salieron:</span>
+			<button on:click={() => (alreadySeen.length ? reset() : console.log("nope"))}>Reiniciar</button>
+		</div>
 		<div class='letters-content'>{alreadySeenString}</div>
 	</div>
 </div>
@@ -88,6 +120,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+		margin: 40px 0;
 		width: 256px;
 	}
 	.counter {
@@ -144,7 +177,19 @@
 		width: 100%;
 	}
 	.letters-title {
+		position: relative;
 		width: 100%;
+	}
+	.letters-title button {
+		border-radius: 20px;
+		border: none;
+		cursor: pointer;
+		font-size: 14px;
+		height: 20px;
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
 	}
 	.letters-content {
 		font-size: 14px;
