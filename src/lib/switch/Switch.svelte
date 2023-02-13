@@ -43,9 +43,10 @@
     const display = document.getElementById('countdown')
 
     // @ts-ignore
-    let minutes = parseInt(Math.floor(timer / 3600), 10);
+    let minutes = parseInt(Math.floor(timer / 60), 10);
     // @ts-ignore
     let seconds = parseInt(timer % 60, 10);
+    console.log(minutes, seconds)
     
     // @ts-ignore
     minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -121,7 +122,7 @@
     <div class='timer-wrapper'>
       <input on:input={handleTimerChange} disabled={!timerCheckbox} type="number" class="timer" />
       <span class="ms">seg</span>
-      <span class={`seg ${!timerCheckbox ? 'hidden' : ''}`}>{`${(timer/3600.0).toFixed(2)} minutos`}</span>
+      <span class={`seg ${!timerCheckbox ? 'hidden' : ''}`}>{`${(timer/60.0).toFixed(2)} minutos`}</span>
     </div>
     <div id="countdown">
       {timeFormatted}
